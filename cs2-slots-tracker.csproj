@@ -1,0 +1,44 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net7.0</TargetFramework>
+    <RootNamespace>cs2_slots_tracker</RootNamespace>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <!-- Publish settings -->
+    <PublishReadyToRun>false</PublishReadyToRun>
+    <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
+    <OutDir>$(ProjectDir)build\counterstrikesharp\plugins\cs2-slots-tracker</OutDir>
+    <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+    <ProduceReferenceAssembly>false</ProduceReferenceAssembly>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="CounterStrikeSharp.API" Version="1.0.142">
+      <PrivateAssets>none</PrivateAssets>
+      <ExcludeAssets>runtime</ExcludeAssets>
+    </PackageReference>
+    <PackageReference Include="Dapper" Version="2.1.24" />
+    <PackageReference Include="MySqlConnector" Version="2.3.3" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="config.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
+  <!-- Exclude unnecessary files from publish -->
+  <ItemGroup>
+    <None Remove="*.pdb" />
+    <None Remove="*.deps.json" />
+  </ItemGroup>
+
+  <!-- Publish settings -->
+  <PropertyGroup>
+    <PublishSingleFile>false</PublishSingleFile>
+    <SelfContained>false</SelfContained>
+    <IncludeAllContentForSelfExtract>false</IncludeAllContentForSelfExtract>
+  </PropertyGroup>
+
+</Project>

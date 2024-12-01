@@ -1,0 +1,15 @@
+c:\Users\rubin\cs2-slots-tracker\build\counterstrikesharp\plugins\cs2-slots-tracker\config.json
+c:\Users\rubin\cs2-slots-tracker\build\counterstrikesharp\plugins\cs2-slots-tracker\cs2-slots-tracker.deps.json
+c:\Users\rubin\cs2-slots-tracker\build\counterstrikesharp\plugins\cs2-slots-tracker\cs2-slots-tracker.dll
+c:\Users\rubin\cs2-slots-tracker\build\counterstrikesharp\plugins\cs2-slots-tracker\cs2-slots-tracker.pdb
+c:\Users\rubin\cs2-slots-tracker\build\counterstrikesharp\plugins\cs2-slots-tracker\Dapper.dll
+c:\Users\rubin\cs2-slots-tracker\build\counterstrikesharp\plugins\cs2-slots-tracker\Microsoft.Extensions.Logging.Abstractions.dll
+c:\Users\rubin\cs2-slots-tracker\build\counterstrikesharp\plugins\cs2-slots-tracker\MySqlConnector.dll
+c:\Users\rubin\cs2-slots-tracker\obj\Release\cs2-slots-tracker.csproj.AssemblyReference.cache
+c:\Users\rubin\cs2-slots-tracker\obj\Release\cs2-slots-tracker.GeneratedMSBuildEditorConfig.editorconfig
+c:\Users\rubin\cs2-slots-tracker\obj\Release\cs2-slots-tracker.AssemblyInfoInputs.cache
+c:\Users\rubin\cs2-slots-tracker\obj\Release\cs2-slots-tracker.AssemblyInfo.cs
+c:\Users\rubin\cs2-slots-tracker\obj\Release\cs2-slots-tracker.csproj.CoreCompileInputs.cache
+c:\Users\rubin\cs2-slots-tracker\obj\Release\cs2-slot.6363E59C.Up2Date
+c:\Users\rubin\cs2-slots-tracker\obj\Release\cs2-slots-tracker.dll
+c:\Users\rubin\cs2-slots-tracker\obj\Release\cs2-slots-tracker.pdb
