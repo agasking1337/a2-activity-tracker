@@ -8,6 +8,8 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write # This is required for creating releases
     
     steps:
     - name: Checkout code
