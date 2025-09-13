@@ -22,10 +22,10 @@ jobs:
       run: find . -type f -name "*.csproj"
         
     - name: Restore dependencies
-      run: dotnet restore
+      run: dotnet restore src/cs2-slots-tracker.csproj
       
     - name: Build
-      run: dotnet build --configuration Release --no-restore
+      run: dotnet build src/cs2-slots-tracker.csproj --configuration Release --no-restore
       
     - name: Get version from tag
       id: get_version
@@ -35,7 +35,7 @@ jobs:
       run: |
         mkdir -p release/cs2-slots-tracker
         find . -name "*.dll" -type f
-        cp $(find . -name "cs2-slots-tracker.dll" -type f) release/cs2-slots-tracker/ || echo "Main DLL not found"
+        cp $(find . -name "a2-activity-tracker.dll" -type f) release/cs2-slots-tracker/ || echo "Main DLL not found"
         cp $(find . -name "MySqlConnector.dll" -type f) release/cs2-slots-tracker/ || echo "MySqlConnector DLL not found"
         cp README.md release/cs2-slots-tracker/ || echo "README not found"
         cd release
