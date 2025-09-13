@@ -44,12 +44,12 @@ jobs:
     - name: Create plugin package
       run: |
         mkdir -p release/addons/counterstrikesharp/plugins/a2-activity-tracker
-        find . -name "*.dll" -type f
-        cp $(find . -name "a2-activity-tracker.dll" -type f) release/addons/counterstrikesharp/plugins/a2-activity-tracker/ || echo "Main DLL not found"
-        cp $(find . -name "MySqlConnector.dll" -type f) release/addons/counterstrikesharp/plugins/a2-activity-tracker/ || echo "MySqlConnector DLL not found"
-        cp README.md release/addons/counterstrikesharp/plugins/a2-activity-tracker/ || echo "README not found"
+        echo "Finding DLLs in build directory..."
+        # Use the build directory as the primary source for DLLs
+        cp -f ./src/build/counterstrikesharp/plugins/a2-activity-tracker/*.dll release/addons/counterstrikesharp/plugins/a2-activity-tracker/ || echo "No DLLs found in build directory"
+        cp -f README.md release/addons/counterstrikesharp/plugins/a2-activity-tracker/ || echo "README not found"
         cd release
-        zip -r a2-activity-tracker-${{ env.VERSION }}.zip a2-activity-tracker/
+        zip -r a2-activity-tracker-${{ env.VERSION }}.zip addons/
       
     - name: Create Release
       id: create_release
