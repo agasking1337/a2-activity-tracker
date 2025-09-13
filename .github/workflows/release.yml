@@ -43,11 +43,11 @@ jobs:
       
     - name: Create plugin package
       run: |
-        mkdir -p release/a2-activity-tracker
+        mkdir -p release/addons/counterstrikesharp/plugins/a2-activity-tracker
         find . -name "*.dll" -type f
-        cp $(find . -name "a2-activity-tracker.dll" -type f) release/a2-activity-tracker/ || echo "Main DLL not found"
-        cp $(find . -name "MySqlConnector.dll" -type f) release/a2-activity-tracker/ || echo "MySqlConnector DLL not found"
-        cp README.md release/a2-activity-tracker/ || echo "README not found"
+        cp $(find . -name "a2-activity-tracker.dll" -type f) release/addons/counterstrikesharp/plugins/a2-activity-tracker/ || echo "Main DLL not found"
+        cp $(find . -name "MySqlConnector.dll" -type f) release/addons/counterstrikesharp/plugins/a2-activity-tracker/ || echo "MySqlConnector DLL not found"
+        cp README.md release/addons/counterstrikesharp/plugins/a2-activity-tracker/ || echo "README not found"
         cd release
         zip -r a2-activity-tracker-${{ env.VERSION }}.zip a2-activity-tracker/
       
@@ -55,7 +55,7 @@ jobs:
       id: create_release
       uses: softprops/action-gh-release@v1
       with:
-        files: release/a2-activity-tracker-${{ env.VERSION }}.zip
+        files: release/addons/counterstrikesharp/plugins/a2-activity-tracker-${{ env.VERSION }}.zip
         name: Release ${{ env.VERSION }}
         draft: false
         prerelease: false

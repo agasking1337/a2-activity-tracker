@@ -43,7 +43,7 @@ public partial class SlotTracker : BasePlugin
         try
         {
             var secondsUntilRun = GetSecondsUntilNextAggregation();
-            Log($"[SlotTracker] Scheduling daily aggregation in {secondsUntilRun} seconds.");
+            Log($"[A2ActivityTracker] Scheduling daily aggregation in {secondsUntilRun} seconds.");
             AddTimer((float)secondsUntilRun, () =>
             {
                 RunDailyAggregation();
@@ -53,7 +53,7 @@ public partial class SlotTracker : BasePlugin
         }
         catch (Exception ex)
         {
-            Log($"[SlotTracker] Failed to schedule daily aggregation: {ex.Message}");
+            Log($"[A2ActivityTracker] Failed to schedule daily aggregation: {ex.Message}");
         }
     }
 
@@ -74,7 +74,7 @@ public partial class SlotTracker : BasePlugin
             // Immediately save the new map session to database
             SaveMapSessionToDatabase(_currentMapSession);
             
-            Log($"[SlotTracker] EnsureMapSessionActive: started map session for '{map}' and saved to database (reason={reason})");
+            Log($"[A2ActivityTracker] EnsureMapSessionActive: started map session for '{map}' and saved to database (reason={reason})");
         }
     }
 
@@ -92,11 +92,11 @@ public partial class SlotTracker : BasePlugin
 
     private void RunDailyAggregation()
     {
-        Log("[SlotTracker] Running daily aggregation...");
+        Log("[A2ActivityTracker] Running daily aggregation...");
         var connectionString = GetConnectionString();
         if (string.IsNullOrEmpty(connectionString))
         {
-            Log("[SlotTracker] Skipping daily aggregation: invalid connection string");
+            Log("[A2ActivityTracker] Skipping daily aggregation: invalid connection string");
             return;
         }
 
@@ -108,11 +108,11 @@ public partial class SlotTracker : BasePlugin
             // Generate analytics for yesterday (UTC date derived from server local time - 1 day)
             var dateUtc = DateTime.UtcNow.AddDays(-1).Date;
             Analytics.GenerateDailyAnalytics(conn, dateUtc, Log);
-            Log("[SlotTracker] Daily analytics generated successfully.");
+            Log("[A2ActivityTracker] Daily analytics generated successfully.");
         }
         catch (Exception ex)
         {
-            Log($"[SlotTracker] Daily aggregation failed: {ex.Message}");
+            Log($"[A2ActivityTracker] Daily aggregation failed: {ex.Message}");
         }
     }
 
@@ -120,7 +120,7 @@ public partial class SlotTracker : BasePlugin
     {
         base.Load(hotReload);
         
-        Log("[SlotTracker] Plugin loading...");
+        Log("[A2ActivityTracker] Plugin loading...");
         
         // Ensure config file exists (create default if missing) and load it
         EnsureConfigFile();
@@ -134,12 +134,12 @@ public partial class SlotTracker : BasePlugin
         }
         else
         {
-            Log("[SlotTracker] Config has placeholder or empty values. Skipping database initialization until valid credentials are provided.");
+            Log("[A2ActivityTracker] Config has placeholder or empty values. Skipping database initialization until valid credentials are provided.");
         }
 
         // Initialize with default value
         _serverSlots = 10; // Default value
-        Log($"[SlotTracker] Server initialized with default slots: {_serverSlots}");
+        Log($"[A2ActivityTracker] Server initialized with default slots: {_serverSlots}");
 
         // Register event handlers
         RegisterEventHandler<EventPlayerConnectFull>(OnPlayerConnect, HookMode.Post);
@@ -151,7 +151,7 @@ public partial class SlotTracker : BasePlugin
         AddCommand("css_stats_now", "Force-write a snapshot to a2_server_stats (debug only)", CommandStatsNow);
         AddCommand("css_who", "Show current non-bot players and map info (debug)", CommandWho);
         
-        Log("[SlotTracker] Plugin loaded successfully!");
+        Log("[A2ActivityTracker] Plugin loaded successfully!");
 
         // Add timer to update server slots once server is ready
         AddTimer(1.0f, () => 
@@ -159,11 +159,11 @@ public partial class SlotTracker : BasePlugin
             try 
             {
                 _serverSlots = Server.MaxPlayers;
-                Log($"[SlotTracker] Updated server slots to: {_serverSlots}");
+                Log($"[A2ActivityTracker] Updated server slots to: {_serverSlots}");
             }
             catch (Exception ex)
             {
-                Log($"[SlotTracker] Error getting server slots: {ex.Message}");
+                Log($"[A2ActivityTracker] Error getting server slots: {ex.Message}");
             }
         });
 
@@ -182,12 +182,12 @@ public partial class SlotTracker : BasePlugin
                     // Immediately save the new map session to database
                     SaveMapSessionToDatabase(_currentMapSession);
                     
-                    Log($"[SlotTracker] Initialized map session on load and saved to database: {map}");
+                    Log($"[A2ActivityTracker] Initialized map session on load and saved to database: {map}");
                 }
             }
             catch (Exception ex)
             {
-                Log($"[SlotTracker] Error initializing map session on load: {ex.Message}");
+                Log($"[A2ActivityTracker] Error initializing map session on load: {ex.Message}");
             }
         });
 
@@ -204,10 +204,10 @@ public partial class SlotTracker : BasePlugin
     {
         try
         {
-            Log("[SlotTracker] Initializing database...");
+            Log("[A2ActivityTracker] Initializing database...");
             using var conn = new MySqlConnection(GetConnectionString());
             conn.Open();
-            Log("[SlotTracker] Database connection test successful");
+            Log("[A2ActivityTracker] Database connection test successful");
 
             // Create table if it doesn't exist
             using (var cmd = new MySqlCommand(DbSql.CreateAnalyticsTable, conn))
@@ -226,7 +226,7 @@ public partial class SlotTracker : BasePlugin
                 // 1061: duplicate key name (index already exists) — safe to ignore
                 if (idxEx.Number != 1061)
                 {
-                    Log($"[SlotTracker] Index creation warning: {idxEx.Message}");
+                    Log($"[A2ActivityTracker] Index creation warning: {idxEx.Message}");
                 }
             }
 
@@ -247,7 +247,7 @@ public partial class SlotTracker : BasePlugin
                 // 1091: Can't DROP; check that column/key exists — safe to ignore
                 if (idxEx.Number != 1091)
                 {
-                    Log($"[SlotTracker] Index drop warning: {idxEx.Message}");
+                    Log($"[A2ActivityTracker] Index drop warning: {idxEx.Message}");
                 }
             }
 
@@ -264,7 +264,7 @@ public partial class SlotTracker : BasePlugin
                     // 1054: Unknown column — both safe to ignore
                     if (colEx.Number != 1091 && colEx.Number != 1054)
                     {
-                        Log($"[SlotTracker] Column drop warning for '{legacyCol}': {colEx.Message}");
+                        Log($"[A2ActivityTracker] Column drop warning for '{legacyCol}': {colEx.Message}");
                     }
                 }
             }
@@ -286,12 +286,12 @@ public partial class SlotTracker : BasePlugin
             Analytics.EnsureAnalyticsSchema(conn, Log);
 
             // No additional index required: PRIMARY KEY on date_utc is sufficient.
-            Log("[SlotTracker] Database initialized successfully");
+            Log("[A2ActivityTracker] Database initialized successfully");
         }
         catch (Exception ex)
         {
-            Log($"[SlotTracker] Database initialization error: {ex.Message}");
-            Log($"[SlotTracker] Stack trace: {ex.StackTrace}");
+            Log($"[A2ActivityTracker] Database initialization error: {ex.Message}");
+            Log($"[A2ActivityTracker] Stack trace: {ex.StackTrace}");
         }
     }
 
@@ -301,8 +301,8 @@ public partial class SlotTracker : BasePlugin
         try 
         {
             _serverSlots = Server.MaxPlayers;
-            Log($"[SlotTracker] Server slots updated on map start: {_serverSlots}");
-            Log($"[SlotTracker] Map started: {mapName}");
+            Log($"[A2ActivityTracker] Server slots updated on map start: {_serverSlots}");
+            Log($"[A2ActivityTracker] Map started: {mapName}");
 
             // Close previous map session if one is open
             if (_currentMapSession != null && _currentMapSession.IsActive)
@@ -318,11 +318,11 @@ public partial class SlotTracker : BasePlugin
             // Immediately save the new map session to database
             SaveMapSessionToDatabase(_currentMapSession);
             
-            Log($"[SlotTracker] New map session created and saved to database: {mapName}");
+            Log($"[A2ActivityTracker] New map session created and saved to database: {mapName}");
         }
         catch (Exception ex)
         {
-            Log($"[SlotTracker] Error updating server slots on map start: {ex.Message}");
+            Log($"[A2ActivityTracker] Error updating server slots on map start: {ex.Message}");
         }
     }
 
@@ -332,7 +332,7 @@ public partial class SlotTracker : BasePlugin
         {
             string map = string.Empty;
             try { map = Server.MapName ?? string.Empty; } catch { }
-            Log($"[SlotTracker] Map ended: {map}");
+            Log($"[A2ActivityTracker] Map ended: {map}");
 
             // End and persist current map session
             if (_currentMapSession != null && _currentMapSession.IsActive)
@@ -343,7 +343,7 @@ public partial class SlotTracker : BasePlugin
         }
         catch (Exception ex)
         {
-            Log($"[SlotTracker] Error in OnMapEnd: {ex.Message}");
+            Log($"[A2ActivityTracker] Error in OnMapEnd: {ex.Message}");
         }
     }
 
@@ -368,11 +368,11 @@ public partial class SlotTracker : BasePlugin
                     Directory.CreateDirectory(dir);
                     File.Copy(legacy, configPath, overwrite: true);
                     loadPath = configPath;
-                    Log($"[SlotTracker] Migrated legacy config from '{legacy}' to '{configPath}'.");
+                    Log($"[A2ActivityTracker] Migrated legacy config from '{legacy}' to '{configPath}'.");
                 }
                 catch (Exception migLegacyEx)
                 {
-                    Log($"[SlotTracker] Could not migrate legacy config to new path: {migLegacyEx.Message}. Will use legacy path.");
+                    Log($"[A2ActivityTracker] Could not migrate legacy config to new path: {migLegacyEx.Message}. Will use legacy path.");
                     loadPath = legacy;
                 }
             }
@@ -390,11 +390,11 @@ public partial class SlotTracker : BasePlugin
                         Directory.CreateDirectory(dir);
                         File.Copy(fallback, configPath, overwrite: true);
                         loadPath = configPath;
-                        Log($"[SlotTracker] Migrated existing config from '{fallback}' to '{configPath}'.");
+                        Log($"[A2ActivityTracker] Migrated existing config from '{fallback}' to '{configPath}'.");
                     }
                     catch (Exception migEx)
                     {
-                        Log($"[SlotTracker] Could not migrate config to configs path: {migEx.Message}. Will use fallback path.");
+                        Log($"[A2ActivityTracker] Could not migrate config to configs path: {migEx.Message}. Will use fallback path.");
                         loadPath = fallback;
                     }
                 }
@@ -436,7 +436,7 @@ public partial class SlotTracker : BasePlugin
                 }
                 catch (Exception dirEx)
                 {
-                    Log($"[SlotTracker] Failed to create configs directory '{dir}': {dirEx.Message}");
+                    Log($"[A2ActivityTracker] Failed to create configs directory '{dir}': {dirEx.Message}");
                 }
 
                 var options = new JsonSerializerOptions { WriteIndented = true };
@@ -447,14 +447,14 @@ public partial class SlotTracker : BasePlugin
                 }
                 catch (Exception writeEx)
                 {
-                    Log($"[SlotTracker] Failed to write config at '{configPath}': {writeEx.Message}");
+                    Log($"[A2ActivityTracker] Failed to write config at '{configPath}': {writeEx.Message}");
                 }
 
                 // Verify creation
                 if (File.Exists(configPath))
                 {
-                    Log($"[SlotTracker] No config.json found. A default config has been created at: {configPath}");
-                    Log("[SlotTracker] Please update the file with your MySQL credentials. Database initialization will be attempted on next load.");
+                    Log($"[A2ActivityTracker] No config.json found. A default config has been created at: {configPath}");
+                    Log("[A2ActivityTracker] Please update the file with your MySQL credentials. Database initialization will be attempted on next load.");
                 }
                 else
                 {
@@ -467,24 +467,24 @@ public partial class SlotTracker : BasePlugin
                         File.WriteAllText(fallbackPath, json);
                         if (File.Exists(fallbackPath))
                         {
-                            Log($"[SlotTracker] Warning: Failed to create config in configs path. Created fallback config at: {fallbackPath}");
-                            Log("[SlotTracker] You can move this file to the configs path or leave it here; the plugin prefers the configs path.");
+                            Log($"[A2ActivityTracker] Warning: Failed to create config in configs path. Created fallback config at: {fallbackPath}");
+                            Log("[A2ActivityTracker] You can move this file to the configs path or leave it here; the plugin prefers the configs path.");
                         }
                         else
                         {
-                            Log("[SlotTracker] Error: Could not create config file in either location.");
+                            Log("[A2ActivityTracker] Error: Could not create config file in either location.");
                         }
                     }
                     catch (Exception fbEx)
                     {
-                        Log($"[SlotTracker] Fallback config creation failed: {fbEx.Message}");
+                        Log($"[A2ActivityTracker] Fallback config creation failed: {fbEx.Message}");
                     }
                 }
             }
         }
         catch (Exception ex)
         {
-            Log($"[SlotTracker] Failed to ensure/create config file: {ex.Message}");
+            Log($"[A2ActivityTracker] Failed to ensure/create config file: {ex.Message}");
         }
     }
 
@@ -544,28 +544,28 @@ public partial class SlotTracker : BasePlugin
 
     private HookResult OnPlayerConnect(EventPlayerConnectFull @event, GameEventInfo info)
     {
-        Log("[SlotTracker] OnPlayerConnect event triggered");
+        Log("[A2ActivityTracker] OnPlayerConnect event triggered");
         
         var player = @event.Userid;
         if (player == null)
         {
-            Log("[SlotTracker] Player is null");
+            Log("[A2ActivityTracker] Player is null");
             return HookResult.Continue;
         }
 
         if (player.IsBot)
         {
-            Log("[SlotTracker] Skipping bot connect");
+            Log("[A2ActivityTracker] Skipping bot connect");
             return HookResult.Continue;
         }
 
         if (player.IsHLTV)
         {
-            Log("[SlotTracker] Skipping HLTV connect");
+            Log("[A2ActivityTracker] Skipping HLTV connect");
             return HookResult.Continue;
         }
 
-        Log($"[SlotTracker] Player connecting: {player.PlayerName} (SteamID: {player.SteamID})");
+        Log($"[A2ActivityTracker] Player connecting: {player.PlayerName} (SteamID: {player.SteamID})");
         // Player session debug log
         Log($"[PlayerSession] OPEN steam_id={player.SteamID} connect_time={DateTime.Now:yyyy-MM-dd HH:mm:ss}");
 
@@ -588,29 +588,29 @@ public partial class SlotTracker : BasePlugin
 
     private HookResult OnPlayerDisconnect(EventPlayerDisconnect @event, GameEventInfo info)
     {
-        Log("[SlotTracker] OnPlayerDisconnect event triggered");
+        Log("[A2ActivityTracker] OnPlayerDisconnect event triggered");
         
         var player = @event.Userid;
         if (player == null)
         {
-            Log("[SlotTracker] Player is null");
+            Log("[A2ActivityTracker] Player is null");
             return HookResult.Continue;
         }
 
         if (player.IsBot)
         {
-            Log("[SlotTracker] Skipping bot disconnect");
+            Log("[A2ActivityTracker] Skipping bot disconnect");
             return HookResult.Continue;
         }
 
         if (player.IsHLTV)
         {
-            Log("[SlotTracker] Skipping HLTV disconnect");
+            Log("[A2ActivityTracker] Skipping HLTV disconnect");
             return HookResult.Continue;
         }
 
         // Log disconnect details for debugging
-        Log($"[SlotTracker] Disconnect event - Player: {player.PlayerName}, SteamID: {player.SteamID}, Reason: {@event.Reason}");
+        Log($"[A2ActivityTracker] Disconnect event - Player: {player.PlayerName}, SteamID: {player.SteamID}, Reason: {@event.Reason}");
         // Player session debug log
         Log($"[PlayerSession] CLOSE steam_id={player.SteamID} disconnect_time={DateTime.Now:yyyy-MM-dd HH:mm:ss}");
 
@@ -631,7 +631,7 @@ public partial class SlotTracker : BasePlugin
         // Check for Steam ban disconnect (2006) or kick (6)
         if (@event.Reason == 2006 || @event.Reason == 6)
         {
-            Log($"[SlotTracker] Ban/kick detected for {player.PlayerName}, skipping database update");
+            Log($"[A2ActivityTracker] Ban/kick detected for {player.PlayerName}, skipping database update");
             return HookResult.Continue;
         }
 
@@ -641,7 +641,7 @@ public partial class SlotTracker : BasePlugin
 
     private void UpdateDatabase(CCSPlayerController player, string eventType)
     {
-        Log($"[SlotTracker] Starting database update for {eventType} - Player: {player.PlayerName}");
+        Log($"[A2ActivityTracker] Starting database update for {eventType} - Player: {player.PlayerName}");
 
         try
         {
@@ -653,21 +653,21 @@ public partial class SlotTracker : BasePlugin
         }
         catch (Exception ex)
         {
-            Log($"[SlotTracker] Unexpected error in UpdateDatabase: {ex.Message}");
-            Log($"[SlotTracker] Stack Trace: {ex.StackTrace}");
+            Log($"[A2ActivityTracker] Unexpected error in UpdateDatabase: {ex.Message}");
+            Log($"[A2ActivityTracker] Stack Trace: {ex.StackTrace}");
         }
     }
 
     private int GetConnectedPlayersCount()
     {
         var players = Utilities.GetPlayers();
-        Log($"[SlotTracker] Total players found: {players.Count}");
+        Log($"[A2ActivityTracker] Total players found: {players.Count}");
         var currentPlayers = players
             .Count(p => p != null &&
                    p.Connected == PlayerConnectedState.PlayerConnected &&
                    !p.IsBot &&
                    !p.IsHLTV);
-        Log($"[SlotTracker] Connected non-bot players: {currentPlayers}");
+        Log($"[A2ActivityTracker] Connected non-bot players: {currentPlayers}");
         return currentPlayers;
     }
 
@@ -676,7 +676,7 @@ public partial class SlotTracker : BasePlugin
         _lastEventType = eventType;
         if (_writeScheduled)
         {
-            Log("[SlotTracker] Write already scheduled, debouncing additional events.");
+            Log("[A2ActivityTracker] Write already scheduled, debouncing additional events.");
             return;
         }
 
@@ -691,7 +691,7 @@ public partial class SlotTracker : BasePlugin
             }
             catch (Exception ex)
             {
-                Log($"[SlotTracker] Error during debounced write: {ex.Message}");
+                Log($"[A2ActivityTracker] Error during debounced write: {ex.Message}");
             }
             finally
             {
@@ -706,7 +706,7 @@ public partial class SlotTracker : BasePlugin
         var connectionString = GetConnectionString();
         if (string.IsNullOrEmpty(connectionString))
         {
-            Log("[SlotTracker] Error: Invalid connection string");
+            Log("[A2ActivityTracker] Error: Invalid connection string");
             return;
         }
 
@@ -716,12 +716,12 @@ public partial class SlotTracker : BasePlugin
         try
         {
             conn.Open();
-            Log("[SlotTracker] Database connection test successful");
+            Log("[A2ActivityTracker] Database connection test successful");
         }
         catch (Exception ex)
         {
-            Log($"[SlotTracker] Failed to connect to database: {ex.Message}");
-            Log($"[SlotTracker] Connection error stack trace: {ex.StackTrace}");
+            Log($"[A2ActivityTracker] Failed to connect to database: {ex.Message}");
+            Log($"[A2ActivityTracker] Connection error stack trace: {ex.StackTrace}");
             return;
         }
 
@@ -747,12 +747,12 @@ public partial class SlotTracker : BasePlugin
 
                 if (rowsAffected > 0)
                 {
-                    Log($"[SlotTracker] Database update successful - {rowsAffected} rows affected");
-                    Log($"[SlotTracker] Updated values - Players: {currentPlayers}/{_serverSlots}, Time: {stats.Timestamp:yyyy-MM-dd HH:mm:ss}");
+                    Log($"[A2ActivityTracker] Database update successful - {rowsAffected} rows affected");
+                    Log($"[A2ActivityTracker] Updated values - Players: {currentPlayers}/{_serverSlots}, Time: {stats.Timestamp:yyyy-MM-dd HH:mm:ss}");
                 }
                 else
                 {
-                    Log("[SlotTracker] Warning: Database update completed but no rows were affected");
+                    Log("[A2ActivityTracker] Warning: Database update completed but no rows were affected");
                 }
             }
 
@@ -773,19 +773,19 @@ public partial class SlotTracker : BasePlugin
                         PlayerCount = reader.GetInt32("player_count"),
                         ServerSlots = reader.GetInt32("server_slots")
                     };
-                    Log($"[SlotTracker] Verification - Latest record: Players: {latestRecord.PlayerCount}/{latestRecord.ServerSlots}, Time: {latestRecord.Timestamp:yyyy-MM-dd HH:mm:ss}");
+                    Log($"[A2ActivityTracker] Verification - Latest record: Players: {latestRecord.PlayerCount}/{latestRecord.ServerSlots}, Time: {latestRecord.Timestamp:yyyy-MM-dd HH:mm:ss}");
                 }
                 else
                 {
-                    Log("[SlotTracker] Warning: Could not verify the update - no records found");
+                    Log("[A2ActivityTracker] Warning: Could not verify the update - no records found");
                 }
             }
         }
         catch (MySqlException ex)
         {
-            Log($"[SlotTracker] MySQL Error during insert: {ex.Message}");
-            Log($"[SlotTracker] Error Code: {ex.Number}");
-            Log($"[SlotTracker] Stack Trace: {ex.StackTrace}");
+            Log($"[A2ActivityTracker] MySQL Error during insert: {ex.Message}");
+            Log($"[A2ActivityTracker] Error Code: {ex.Number}");
+            Log($"[A2ActivityTracker] Stack Trace: {ex.StackTrace}");
         }
     }
 
@@ -795,18 +795,18 @@ public partial class SlotTracker : BasePlugin
         {
             if (_config == null)
             {
-                Log("[SlotTracker] Error: Database config is null!");
+                Log("[A2ActivityTracker] Error: Database config is null!");
                 return string.Empty;
             }
 
             var connString = $"Server={_config.Host};Database={_config.Database};User={_config.User};Password={_config.Password};Port={_config.Port};";
             // Do not print the full connection string to avoid leaking secrets
-            Log("[SlotTracker] Built database connection string (hidden)");
+            Log("[A2ActivityTracker] Built database connection string (hidden)");
             return connString;
         }
         catch (Exception ex)
         {
-            Log($"[SlotTracker] Error building connection string: {ex.Message}");
+            Log($"[A2ActivityTracker] Error building connection string: {ex.Message}");
             return string.Empty;
         }
     }
@@ -829,7 +829,7 @@ public partial class SlotTracker : BasePlugin
                     string map = string.Empty;
                     try { map = Server.MapName ?? string.Empty; } catch { }
                     var count = GetConnectedPlayersCount();
-                    Log($"[SlotTracker] Heartbeat - Map: {map}, Players: {count}/{_serverSlots}");
+                    Log($"[A2ActivityTracker] Heartbeat - Map: {map}, Players: {count}/{_serverSlots}");
                 }
             }
             catch { }
@@ -852,7 +852,7 @@ public partial class SlotTracker : BasePlugin
             }
             catch (Exception ex)
             {
-                Log($"[SlotTracker] FlushPooledWork error: {ex.Message}");
+                Log($"[A2ActivityTracker] FlushPooledWork error: {ex.Message}");
             }
             finally
             {
@@ -879,7 +879,7 @@ public partial class SlotTracker : BasePlugin
         }
 
         var cs = GetConnectionString();
-        if (string.IsNullOrEmpty(cs)) { Log("[SlotTracker] FlushPooledWork: empty connection string"); return; }
+        if (string.IsNullOrEmpty(cs)) { Log("[A2ActivityTracker] FlushPooledWork: empty connection string"); return; }
 
         using var conn = new MySqlConnection(cs);
         conn.Open();
@@ -904,7 +904,7 @@ public partial class SlotTracker : BasePlugin
                     cmdOpen.Parameters["@sid"].Value = o.SteamId;
                     cmdOpen.Parameters["@now"].Value = o.ConnectTime;
                     cmdOpen.ExecuteNonQuery();
-                    Log($"[SlotTracker] Player connect processed: SteamID={o.SteamId}, Time={o.ConnectTime:yyyy-MM-dd HH:mm:ss}");
+                    Log($"[A2ActivityTracker] Player connect processed: SteamID={o.SteamId}, Time={o.ConnectTime:yyyy-MM-dd HH:mm:ss}");
                 }
             }
 
@@ -938,7 +938,7 @@ public partial class SlotTracker : BasePlugin
                         var disconnectTime = reader.IsDBNull(1) ? (DateTime?)null : reader.GetDateTime("disconnect_time");
                         var duration = reader.GetInt64("duration_seconds");
                         var sessions = reader.GetInt32("session_count");
-                        Log($"[SlotTracker] Player session updated: SteamID={c.SteamId}, Connect={connectTime:yyyy-MM-dd HH:mm:ss}, Disconnect={disconnectTime:yyyy-MM-dd HH:mm:ss}, Duration={duration}s, Sessions={sessions}");
+                        Log($"[A2ActivityTracker] Player session updated: SteamID={c.SteamId}, Connect={connectTime:yyyy-MM-dd HH:mm:ss}, Disconnect={disconnectTime:yyyy-MM-dd HH:mm:ss}, Duration={duration}s, Sessions={sessions}");
                     }
                     reader.Close();
                 }
@@ -963,7 +963,7 @@ public partial class SlotTracker : BasePlugin
                         updateCmd.Parameters.AddWithValue("@play", session.TotalPlaytime);
                         updateCmd.ExecuteNonQuery();
                         
-                        Log($"[SlotTracker] Updated completed map session (ID: {session.DatabaseId}) - map={session.MapName}, seen={session.TotalPlayersSeen}, play={session.TotalPlaytime}s");
+                        Log($"[A2ActivityTracker] Updated completed map session (ID: {session.DatabaseId}) - map={session.MapName}, seen={session.TotalPlayersSeen}, play={session.TotalPlaytime}s");
                     }
                     else
                     {
@@ -978,10 +978,10 @@ public partial class SlotTracker : BasePlugin
                         insertCmd.Parameters.AddWithValue("@play", session.TotalPlaytime);
                         insertCmd.ExecuteNonQuery();
                         
-                        Log($"[SlotTracker] Inserted new completed map session - map={session.MapName}, seen={session.TotalPlayersSeen}, play={session.TotalPlaytime}s");
+                        Log($"[A2ActivityTracker] Inserted new completed map session - map={session.MapName}, seen={session.TotalPlayersSeen}, play={session.TotalPlaytime}s");
                     }
                 }
-                Log($"[SlotTracker] Processed {mapSessions.Count} completed map sessions");
+                Log($"[A2ActivityTracker] Processed {mapSessions.Count} completed map sessions");
             }
 
             // Update active player sessions every minute
@@ -994,7 +994,7 @@ public partial class SlotTracker : BasePlugin
                 var updatedRows = activePlayersCmd.ExecuteNonQuery();
                 if (updatedRows > 0)
                 {
-                    Log($"[SlotTracker] Updated {updatedRows} active player sessions (+60 seconds)");
+                    Log($"[A2ActivityTracker] Updated {updatedRows} active player sessions (+60 seconds)");
                     
                     // Get details of active sessions for debugging
                     using var detailsCmd = new MySqlCommand(@"SELECT steam_id, connect_time, duration_seconds, session_count 
@@ -1006,14 +1006,14 @@ public partial class SlotTracker : BasePlugin
                         var connectTime = reader.GetDateTime("connect_time");
                         var duration = reader.GetInt64("duration_seconds");
                         var sessions = reader.GetInt32("session_count");
-                        Log($"[SlotTracker] Active player: SteamID={steamId}, Connect={connectTime:yyyy-MM-dd HH:mm:ss}, Duration={duration}s, Sessions={sessions}");
+                        Log($"[A2ActivityTracker] Active player: SteamID={steamId}, Connect={connectTime:yyyy-MM-dd HH:mm:ss}, Duration={duration}s, Sessions={sessions}");
                     }
                     reader.Close();
                 }
             }
             catch (Exception ex)
             {
-                Log($"[SlotTracker] Error updating active player sessions: {ex.Message}");
+                Log($"[A2ActivityTracker] Error updating active player sessions: {ex.Message}");
             }
             
             // Also update current map session stats every minute if active
@@ -1036,7 +1036,7 @@ public partial class SlotTracker : BasePlugin
                         updateCmd.Parameters.AddWithValue("@play", _currentMapSession.TotalPlaytime);
                         updateCmd.ExecuteNonQuery();
                         
-                        Log($"[SlotTracker] Minute update: Map session (ID: {_currentMapSession.DatabaseId}) - map={_currentMapSession.MapName}, seen={_currentMapSession.TotalPlayersSeen}, play={_currentMapSession.TotalPlaytime}s");
+                        Log($"[A2ActivityTracker] Minute update: Map session (ID: {_currentMapSession.DatabaseId}) - map={_currentMapSession.MapName}, seen={_currentMapSession.TotalPlayersSeen}, play={_currentMapSession.TotalPlaytime}s");
                     }
                     else
                     {
@@ -1054,7 +1054,7 @@ public partial class SlotTracker : BasePlugin
                         var newId = Convert.ToInt32(insertCmd.ExecuteScalar());
                         _currentMapSession.DatabaseId = newId;
                         
-                        Log($"[SlotTracker] Created new map session (ID: {newId}) - map={_currentMapSession.MapName}, seen={_currentMapSession.TotalPlayersSeen}, play={_currentMapSession.TotalPlaytime}s");
+                        Log($"[A2ActivityTracker] Created new map session (ID: {newId}) - map={_currentMapSession.MapName}, seen={_currentMapSession.TotalPlayersSeen}, play={_currentMapSession.TotalPlaytime}s");
                     }
                     
                     // Update our reference with the latest persisted values
@@ -1078,16 +1078,16 @@ public partial class SlotTracker : BasePlugin
             }
             catch (Exception ex)
             {
-                Log($"[SlotTracker] Snapshot during flush failed: {ex.Message}");
+                Log($"[A2ActivityTracker] Snapshot during flush failed: {ex.Message}");
             }
 
             tx.Commit();
-            Log($"[SlotTracker] FlushPooledWork committed. Opens={opens.Count}, Closes={closes.Count}, MapSessions={mapSessions.Count}");
+            Log($"[A2ActivityTracker] FlushPooledWork committed. Opens={opens.Count}, Closes={closes.Count}, MapSessions={mapSessions.Count}");
         }
         catch (Exception ex)
         {
             try { tx.Rollback(); } catch { }
-            Log($"[SlotTracker] FlushPooledWork rollback due to error: {ex.Message}");
+            Log($"[A2ActivityTracker] FlushPooledWork rollback due to error: {ex.Message}");
         }
     }
 
@@ -1118,12 +1118,12 @@ public partial class SlotTracker : BasePlugin
             lock (_queueLock)
             {
                 _pendingMapSessions.Add(session);
-                Log($"[SlotTracker] MapSession queued for persistence - map={session.MapName}, seen={session.TotalPlayersSeen}, play={session.TotalPlaytime}s");
+                Log($"[A2ActivityTracker] MapSession queued for persistence - map={session.MapName}, seen={session.TotalPlayersSeen}, play={session.TotalPlaytime}s");
             }
         }
         catch (Exception ex)
         {
-            Log($"[SlotTracker] PersistMapSession error: {ex.Message}");
+            Log($"[A2ActivityTracker] PersistMapSession error: {ex.Message}");
         }
     }
     
@@ -1132,7 +1132,7 @@ public partial class SlotTracker : BasePlugin
         try
         {
             var cs = GetConnectionString();
-            if (string.IsNullOrEmpty(cs)) { Log("[SlotTracker] SaveMapSessionToDatabase: empty connection string"); return; }
+            if (string.IsNullOrEmpty(cs)) { Log("[A2ActivityTracker] SaveMapSessionToDatabase: empty connection string"); return; }
             
             using var conn = new MySqlConnection(cs);
             conn.Open();
@@ -1151,7 +1151,7 @@ public partial class SlotTracker : BasePlugin
             var newId = Convert.ToInt32(insertCmd.ExecuteScalar());
             session.DatabaseId = newId;
             
-            Log($"[SlotTracker] Map session immediately saved to database (ID: {newId}) - map={session.MapName}");
+            Log($"[A2ActivityTracker] Map session immediately saved to database (ID: {newId}) - map={session.MapName}");
             
             // Update our reference to avoid frequent saves in the pooled flush
             _lastPersistedMapSession = new MapSession();
@@ -1162,7 +1162,7 @@ public partial class SlotTracker : BasePlugin
         }
         catch (Exception ex)
         {
-            Log($"[SlotTracker] SaveMapSessionToDatabase error: {ex.Message}");
+            Log($"[A2ActivityTracker] SaveMapSessionToDatabase error: {ex.Message}");
         }
     }
 
@@ -1171,7 +1171,7 @@ public partial class SlotTracker : BasePlugin
         try
         {
             var cs = GetConnectionString();
-            if (string.IsNullOrEmpty(cs)) { Log("[SlotTracker] TryOpenPlayerSession: empty connection string"); return; }
+            if (string.IsNullOrEmpty(cs)) { Log("[A2ActivityTracker] TryOpenPlayerSession: empty connection string"); return; }
             using var conn = new MySqlConnection(cs);
             conn.Open();
             using var cmd = new MySqlCommand(@"INSERT INTO a2_player_sessions
@@ -1184,11 +1184,11 @@ public partial class SlotTracker : BasePlugin
             cmd.Parameters.AddWithValue("@sid", steamId);
             cmd.Parameters.AddWithValue("@now", connectTime);
             var rows = cmd.ExecuteNonQuery();
-            Log($"[SlotTracker] PlayerSession OPEN persisted - rows: {rows}, steam_id={steamId}");
+            Log($"[A2ActivityTracker] PlayerSession OPEN persisted - rows: {rows}, steam_id={steamId}");
         }
         catch (Exception ex)
         {
-            Log($"[SlotTracker] TryOpenPlayerSession error: {ex.Message}");
+            Log($"[A2ActivityTracker] TryOpenPlayerSession error: {ex.Message}");
         }
     }
 
@@ -1197,7 +1197,7 @@ public partial class SlotTracker : BasePlugin
         try
         {
             var cs = GetConnectionString();
-            if (string.IsNullOrEmpty(cs)) { Log("[SlotTracker] TryClosePlayerSession: empty connection string"); return; }
+            if (string.IsNullOrEmpty(cs)) { Log("[A2ActivityTracker] TryClosePlayerSession: empty connection string"); return; }
             using var conn = new MySqlConnection(cs);
             conn.Open();
             using var cmd = new MySqlCommand(@"UPDATE a2_player_sessions
@@ -1211,11 +1211,11 @@ public partial class SlotTracker : BasePlugin
             cmd.Parameters.AddWithValue("@sid", steamId);
             cmd.Parameters.AddWithValue("@now", disconnectTime);
             var rows = cmd.ExecuteNonQuery();
-            Log($"[SlotTracker] PlayerSession CLOSE persisted - rows: {rows}, steam_id={steamId}");
+            Log($"[A2ActivityTracker] PlayerSession CLOSE persisted - rows: {rows}, steam_id={steamId}");
         }
         catch (Exception ex)
         {
-            Log($"[SlotTracker] TryClosePlayerSession error: {ex.Message}");
+            Log($"[A2ActivityTracker] TryClosePlayerSession error: {ex.Message}");
         }
     }
 }

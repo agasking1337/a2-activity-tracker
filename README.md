@@ -1,4 +1,4 @@
-# CS2 Slots Tracker (A2ActivityTracker)
+# A2 Activity Tracker
 
 Simple CS2 plugin that logs live player count vs server slots to MySQL and auto-creates daily stats.
 
