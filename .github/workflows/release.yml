@@ -21,13 +21,21 @@ jobs:
         dotnet-version: '8.0.x'
         
     - name: List files to debug
-      run: find . -type f -name "*.csproj"
+      run: |
+        echo "Current directory:"
+        pwd
+        echo "\nListing all directories:"
+        find . -type d | sort
+        echo "\nListing all .csproj files:"
+        find . -type f -name "*.csproj" || echo "No .csproj files found"
         
     - name: Restore dependencies
-      run: dotnet restore "./src/a2-activity-tracker.csproj"
+      run: |
+        find . -name "*.csproj" -exec dotnet restore {} \;
       
     - name: Build
-      run: dotnet build "./src/a2-activity-tracker.csproj" --configuration Release --no-restore
+      run: |
+        find . -name "*.csproj" -exec dotnet build {} --configuration Release \;
       
     - name: Get version from tag
       id: get_version
