@@ -1,7 +1,0 @@
-{
-    "Host": "YOUR_DATABASE_HOST",
-    "Port": 3306,
-    "Database": "YOUR_DATABASE_NAME",
-    "User": "YOUR_DATABASE_USERNAME",
-    "Password": "YOUR_DATABASE_PASSWORD"
-}

@@ -1,4 +1,0 @@
-C:\Users\rubin\cs2-slots-tracker\obj\Debug\net9.0\cs2-slots-tracker.GeneratedMSBuildEditorConfig.editorconfig
-C:\Users\rubin\cs2-slots-tracker\obj\Debug\net9.0\cs2-slots-tracker.AssemblyInfoInputs.cache
-C:\Users\rubin\cs2-slots-tracker\obj\Debug\net9.0\cs2-slots-tracker.AssemblyInfo.cs
-C:\Users\rubin\cs2-slots-tracker\obj\Debug\net9.0\cs2-slots-tracker.csproj.CoreCompileInputs.cache

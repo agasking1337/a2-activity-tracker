@@ -1,0 +1,52 @@
+name: Build and Release
+
+on:
+  push:
+    tags:
+      - 'v*' # Trigger on tags that start with 'v', e.g., v1.0.0
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+      
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v3
+      with:
+        dotnet-version: '7.0.x'
+        
+    - name: Restore dependencies
+      run: dotnet restore
+      
+    - name: Build
+      run: dotnet build --configuration Release --no-restore
+      
+    - name: Get version from tag
+      id: get_version
+      run: echo "VERSION=${GITHUB_REF#refs/tags/v}" >> $GITHUB_ENV
+      
+    - name: Create plugin package
+      run: |
+        mkdir -p release/SlotTracker
+        cp bin/Release/net7.0/A2ActivityTracker.dll release/SlotTracker/
+        cp bin/Release/net7.0/A2ActivityTracker.pdb release/SlotTracker/
+        cp bin/Release/net7.0/MySqlConnector.dll release/SlotTracker/
+        cp -r configs release/SlotTracker/ || true
+        cp README.md release/SlotTracker/ || true
+        cd release
+        zip -r SlotTracker-${{ env.VERSION }}.zip SlotTracker/
+      
+    - name: Create Release
+      id: create_release
+      uses: softprops/action-gh-release@v1
+      with:
+        files: release/SlotTracker-${{ env.VERSION }}.zip
+        name: Release ${{ env.VERSION }}
+        draft: false
+        prerelease: false
+        generate_release_notes: true
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
