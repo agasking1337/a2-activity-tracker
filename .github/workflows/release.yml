@@ -24,10 +24,10 @@ jobs:
       run: find . -type f -name "*.csproj"
         
     - name: Restore dependencies
-      run: dotnet restore src/cs2-slots-tracker.csproj
+      run: dotnet restore src/a2-activity-tracker.csproj
       
     - name: Build
-      run: dotnet build src/cs2-slots-tracker.csproj --configuration Release --no-restore
+      run: dotnet build src/a2-activity-tracker.csproj --configuration Release --no-restore
       
     - name: Get version from tag
       id: get_version
