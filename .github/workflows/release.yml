@@ -18,6 +18,9 @@ jobs:
       with:
         dotnet-version: '7.0.x'
         
+    - name: List files to debug
+      run: find . -type f -name "*.csproj"
+        
     - name: Restore dependencies
       run: dotnet restore
       
@@ -30,20 +33,19 @@ jobs:
       
     - name: Create plugin package
       run: |
-        mkdir -p release/SlotTracker
-        cp bin/Release/net7.0/A2ActivityTracker.dll release/SlotTracker/
-        cp bin/Release/net7.0/A2ActivityTracker.pdb release/SlotTracker/
-        cp bin/Release/net7.0/MySqlConnector.dll release/SlotTracker/
-        cp -r configs release/SlotTracker/ || true
-        cp README.md release/SlotTracker/ || true
+        mkdir -p release/cs2-slots-tracker
+        find . -name "*.dll" -type f
+        cp $(find . -name "cs2-slots-tracker.dll" -type f) release/cs2-slots-tracker/ || echo "Main DLL not found"
+        cp $(find . -name "MySqlConnector.dll" -type f) release/cs2-slots-tracker/ || echo "MySqlConnector DLL not found"
+        cp README.md release/cs2-slots-tracker/ || echo "README not found"
         cd release
-        zip -r SlotTracker-${{ env.VERSION }}.zip SlotTracker/
+        zip -r cs2-slots-tracker-${{ env.VERSION }}.zip cs2-slots-tracker/
       
     - name: Create Release
       id: create_release
       uses: softprops/action-gh-release@v1
       with:
-        files: release/SlotTracker-${{ env.VERSION }}.zip
+        files: release/cs2-slots-tracker-${{ env.VERSION }}.zip
         name: Release ${{ env.VERSION }}
         draft: false
         prerelease: false
