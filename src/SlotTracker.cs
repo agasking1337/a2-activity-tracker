@@ -137,10 +137,6 @@ public partial class SlotTracker : BasePlugin
             Log("[A2ActivityTracker] Config has placeholder or empty values. Skipping database initialization until valid credentials are provided.");
         }
 
-        // Initialize with default value
-        _serverSlots = 10; // Default value
-        Log($"[A2ActivityTracker] Server initialized with default slots: {_serverSlots}");
-
         // Register event handlers
         RegisterEventHandler<EventPlayerConnectFull>(OnPlayerConnect, HookMode.Post);
         RegisterEventHandler<EventPlayerDisconnect>(OnPlayerDisconnect, HookMode.Pre);
@@ -153,17 +149,30 @@ public partial class SlotTracker : BasePlugin
         
         Log("[A2ActivityTracker] Plugin loaded successfully!");
 
-        // Add timer to update server slots once server is ready
-        AddTimer(1.0f, () => 
+        // Add timer to update server slots from ConVars
+        AddTimer(1.0f, () =>
         {
-            try 
+            try
             {
+                // Try to get the server slots from the sv_visiblemaxplayers ConVar
+                var visibleMaxPlayersConVar = ConVar.Find("sv_visiblemaxplayers");
+                if (visibleMaxPlayersConVar != null)
+                {
+                    _serverSlots = visibleMaxPlayersConVar.GetPrimitiveValue<int>();
+                    Log($"[A2ActivityTracker] Server slots detected from sv_visiblemaxplayers: {_serverSlots}");
+                    return;
+                }
+                
+                // Fallback to Server.MaxPlayers
                 _serverSlots = Server.MaxPlayers;
-                Log($"[A2ActivityTracker] Updated server slots to: {_serverSlots}");
+                Log($"[A2ActivityTracker] Server slots detected from Server.MaxPlayers: {_serverSlots}");
             }
             catch (Exception ex)
             {
-                Log($"[A2ActivityTracker] Error getting server slots: {ex.Message}");
+                Log($"[A2ActivityTracker] Error detecting server slots: {ex.Message}");
+                // Fallback to a reasonable value if detection fails
+                _serverSlots = 18;
+                Log($"[A2ActivityTracker] Using fallback server slots value: {_serverSlots}");
             }
         });
 
@@ -799,7 +808,16 @@ public partial class SlotTracker : BasePlugin
                 return string.Empty;
             }
 
-            var connString = $"Server={_config.Host};Database={_config.Database};User={_config.User};Password={_config.Password};Port={_config.Port};";
+            // Use MySqlConnectionStringBuilder to properly escape special characters
+            var builder = new MySqlConnectionStringBuilder
+            {
+                Server = _config.Host,
+                Database = _config.Database,
+                UserID = _config.User,
+                Password = _config.Password,
+                Port = (uint)_config.Port
+            };
+            var connString = builder.ConnectionString;
             // Do not print the full connection string to avoid leaking secrets
             Log("[A2ActivityTracker] Built database connection string (hidden)");
             return connString;
