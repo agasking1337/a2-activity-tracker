@@ -55,7 +55,7 @@ jobs:
       id: create_release
       uses: softprops/action-gh-release@v1
       with:
-        files: release/addons/counterstrikesharp/plugins/a2-activity-tracker-${{ env.VERSION }}.zip
+        files: release/a2-activity-tracker-${{ env.VERSION }}.zip
         name: Release ${{ env.VERSION }}
         draft: false
         prerelease: false
