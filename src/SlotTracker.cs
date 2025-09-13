@@ -17,7 +17,7 @@ namespace A2ActivityTracker;
 public partial class SlotTracker : BasePlugin
 {
     public override string ModuleName => "A2ActivityTracker";
-    public override string ModuleVersion => "1.1.0";
+    public override string ModuleVersion => "2.0.0";
     public override string ModuleAuthor => "agasking1337";
 
     private DatabaseConfig _config = null!;
